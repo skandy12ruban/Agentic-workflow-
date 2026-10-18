@@ -4,6 +4,8 @@ All notable changes to this library. Format: [Keep a Changelog](https://keepacha
 A **major** bump means an agent/command output format or a configuration key changed in a breaking way; re-run `install.sh --force` and review your `AGENTS.md`.
 
 ## [Unreleased]
+### Added
+- MIT `LICENSE`.
 
 ## [1.1.0] - 2026-10-18
 ### Added

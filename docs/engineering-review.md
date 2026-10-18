@@ -59,7 +59,7 @@
 
 ## 5. Rollout conditions
 
-- [ ] **Choose a license** (e.g. MIT or Apache-2.0) before external sharing. Without one, others can't legally reuse the files.
+- [x] **License chosen:** MIT (`LICENSE`).
 - [ ] Every pilot repo has **branch protection** on its default branch (required review + status checks + no force-push).
 - [ ] Agent tokens are **fine-grained and least-privilege**; no production credentials in agent environments.
 - [ ] Teams run `scripts/test-guardrails.sh` and at least scenarios 1, 3, 7, 9, 13 from `docs/guardrail-tests.md` in their environment before first use.

@@ -6,6 +6,7 @@ Works with **Claude Code, Gemini CLI, OpenAI Codex CLI, Cursor, GitHub Copilot**
 
 [![validate](https://github.com/skandy12ruban/Agentic-workflow-/actions/workflows/validate.yml/badge.svg)](https://github.com/skandy12ruban/Agentic-workflow-/actions/workflows/validate.yml)
 ![tools](https://img.shields.io/badge/tools-Claude%20%C2%B7%20Gemini%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20Copilot-blue)
+![license](https://img.shields.io/badge/license-MIT-green)
 ![guardrail tests](https://img.shields.io/badge/guardrail%20tests-150%20passing-brightgreen)
 
 ```text
@@ -140,4 +141,6 @@ Configs for every tool and a security checklist: **[docs/mcp-servers.md](docs/mc
 - [Engineering review](docs/engineering-review.md): a director-level assessment, findings, residual risks, rollout checklist
 - [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
-> **License:** none chosen yet. Add a `LICENSE` file (e.g. MIT or Apache-2.0) before sharing widely; without one, others can't legally reuse these files.
+## License
+
+[MIT](LICENSE). Copy, adapt, and share freely; keep the copyright notice.
