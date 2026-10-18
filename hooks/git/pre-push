@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Tool-agnostic git pre-push guard (works for every AI agent and for humans).
+#   - Refuses pushes to protected branches (main, master, release/*, ...).
+#   - Refuses deleting remote branches or tags.
+#   - Refuses force-pushes (non-fast-forward updates) to any branch.
+#   - Refuses pushing tags (releases are a human decision).
+#
+# Install:   cp hooks/git/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+# Humans can override deliberately:  AGENTIC_ALLOW_PROTECTED_PUSH=1 git push ...
+#   (the Claude Code bash guard blocks agents from setting AGENTIC_ALLOW_* variables or using --no-verify)
+set -uo pipefail
+
+PROTECTED="${AGENTIC_PROTECTED_BRANCHES:-main|master|develop|development|trunk|stable|prod|production|release/.*|releases/.*|hotfix/.*}"
+fail() { echo "✋ pre-push guardrail: $1" >&2; exit 1; }
+
+[[ "${AGENTIC_ALLOW_PROTECTED_PUSH:-0}" == "1" ]] && exit 0
+
+while read -r _local_ref local_sha remote_ref remote_sha; do
+  [[ -z "${remote_ref:-}" ]] && continue
+  case "$remote_ref" in
+    refs/tags/*) fail "pushing tag '${remote_ref#refs/tags/}'. Tags/releases are created by humans." ;;
+  esac
+  branch="${remote_ref#refs/heads/}"
+  if [[ "$local_sha" =~ ^0+$ ]]; then
+    fail "deleting remote branch '$branch' is not allowed."
+  fi
+  if [[ "$branch" =~ ^($PROTECTED)$ ]]; then
+    fail "pushing to protected branch '$branch'. Push a feature branch and open a pull request."
+  fi
+  if [[ ! "$remote_sha" =~ ^0+$ ]]; then
+    if git cat-file -e "$remote_sha^{commit}" 2>/dev/null; then
+      git merge-base --is-ancestor "$remote_sha" "$local_sha" || \
+        fail "push to '$branch' is not a fast-forward (force-push / history rewrite). Merge or add commits instead."
+    else
+      fail "remote '$branch' has commits you don't have locally ($remote_sha). Fetch and merge first; never overwrite them."
+    fi
+  fi
+done
+
+exit 0

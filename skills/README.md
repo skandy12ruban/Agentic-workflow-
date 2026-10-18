@@ -4,6 +4,7 @@ Skills are on-demand know-how. Each is a folder with a `SKILL.md` (frontmatter `
 
 | Skill | What it gives the agent | Supporting files | Used by |
 |---|---|---|---|
+| [`guardrails`](guardrails/SKILL.md) | **Always-on** safety, integrity and honesty rules: risk classes R0–R4, prompt-injection protocol, secrets, test integrity, kill switch, escalation format | – (enforced by [`hooks/`](../hooks/)) | every agent and command |
 | [`task-intake`](task-intake/SKILL.md) | Fetch + normalize tickets from any tracker into `ticket.md` | – | `/task`, `/plan`, `/fix-bug` |
 | [`stack-detection`](stack-detection/SKILL.md) | Detect languages, frameworks, commands, UI/API surfaces | [`stack-matrix.md`](stack-detection/stack-matrix.md) (15+ ecosystems) | explorer, test-engineer, ci-guardian |
 | [`planning`](planning/SKILL.md) | Write approvable, verifiable plans | [`plan-template.md`](planning/plan-template.md) | planner |

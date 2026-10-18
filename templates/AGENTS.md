@@ -65,6 +65,7 @@ vcs:
   draft_prs: true             # open agent PRs as drafts until CI is green
   reviewers: [ "@acme/web-team" ]   # or rely on CODEOWNERS
 autonomy: supervised          # supervised | standard | autonomous
+sandboxed: false              # set true ONLY in a container/VM with scoped creds; required for autonomous
 auto_approve:                 # only used when autonomy: autonomous
   labels: [ "agent-ok" ]
   max_size: S
@@ -93,6 +94,8 @@ library:                      # where this workflow's agents/skills are installe
 ```
 
 ## Boundaries
+<!-- The `guardrails` skill defines the universal rules (risk classes R0–R4, secrets, test integrity, honesty).
+     Add only project-specific items here. Machine-enforced protected paths go in .agentic/protected-paths. -->
 - ✅ **Always:** run lint + typecheck + affected tests before saying a task is done; follow existing patterns; ask when requirements are ambiguous.
 - ⚠️ **Ask first:** adding dependencies; DB schema changes; changing public API contracts; touching CI config; anything in `infra/`; deleting files.
 - 🚫 **Never:** commit secrets or `.env*`; push to `main`; force-push; merge PRs; run `terraform apply`, `prisma migrate reset`, or anything against staging/prod; edit generated files in `src/generated/` by hand; disable or skip tests to make CI pass.
@@ -101,4 +104,4 @@ library:                      # where this workflow's agents/skills are installe
 Commands: `/task`, `/plan`, `/implement`, `/test`, `/ci-check`, `/review`, `/ui-test`, `/api-test`, `/ship`, `/fix-bug`, `/resume`, `/setup-project`.
 <!-- For tools WITHOUT native subagents/skills, keep the two lines below so the agent can find the role/skill files: -->
 Agents (role prompts): `.agentic/agents/<name>.md` — codebase-explorer, planner, implementer, test-engineer, ci-guardian, code-reviewer, security-auditor, ui-tester, api-tester, debugger, docs-writer.
-Skills (read `SKILL.md` when relevant): `.agentic/skills/<name>/SKILL.md` — task-intake, stack-detection, planning, approval-gate, workflow-state, git-workflow, test-generation, ci-verification, code-review, security-review, ui-testing, api-testing, systematic-debugging.
+Skills (read `SKILL.md` when relevant): `.agentic/skills/<name>/SKILL.md` — **guardrails (always applies)**, task-intake, stack-detection, planning, approval-gate, workflow-state, git-workflow, test-generation, ci-verification, code-review, security-review, ui-testing, api-testing, systematic-debugging.

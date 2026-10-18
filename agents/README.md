@@ -40,7 +40,7 @@ model: inherit               # inherit | sonnet | opus | haiku (or a full model 
 ```
 
 **Tool design choices made here:**
-- Read-only agents (`codebase-explorer`, `code-reviewer`, `security-auditor`) have an explicit allow-list so they *can't* edit, which makes their independence real rather than requested.
+- Read-only agents (`codebase-explorer`, `code-reviewer`, `security-auditor`) have an explicit allow-list without `Edit`/`Write`, so they can't edit files through the file tools. They keep `Bash` for `git diff`/`grep`. A shell command *could* still write, so their instructions forbid it and the [guardrail hooks](../hooks/) block the dangerous cases. For strict isolation, remove `Bash`; the reviewer then needs the diff passed in.
 - Agents that need MCP tools (`ui-tester`, `api-tester`, `ci-guardian`, `debugger`) omit `tools:` so they inherit your configured MCP servers. If you prefer explicit lists, add MCP tool names such as `mcp__playwright__browser_navigate` (Claude Code naming: `mcp__<server>__<tool>`).
 
 ## Customizing

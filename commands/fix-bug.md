@@ -7,6 +7,9 @@ argument-hint: '<TICKET-KEY | error-tracker URL | "description / stack trace" | 
 
 **Input:** $ARGUMENTS
 
+> **Requires** — agents: codebase-explorer, debugger, test-engineer, ci-guardian, code-reviewer, security-auditor · skills: guardrails, task-intake, stack-detection, systematic-debugging, approval-gate, git-workflow, workflow-state · MCP: error tracker, VCS (optional).
+> Missing a file? Do that step yourself from the description here and say which file was missing. **Guardrails:** follow the `guardrails` skill throughout; stop if `.agentic/STOP` exists.
+
 A specialization of `/task` with a debugging-first middle.
 
 1. **Bootstrap + intake** (as `/task` Phases 0–1). For error-tracker links (Sentry, Rollbar, Datadog, Bugsnag…), fetch the event via MCP: stack trace, breadcrumbs, release, frequency, tags. Redact PII.

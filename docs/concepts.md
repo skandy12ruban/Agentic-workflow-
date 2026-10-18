@@ -51,7 +51,7 @@ You type:  /task PROJ-123
 
 | Concept | Claude Code | Gemini CLI | OpenAI Codex CLI | Cursor | GitHub Copilot (VS Code) |
 |---|---|---|---|---|---|
-| Project memory | `CLAUDE.md` | `GEMINI.md` (configurable, can read `AGENTS.md`) | `AGENTS.md` | `.cursor/rules/*.mdc`, `AGENTS.md` | `.github/copilot-instructions.md`, `AGENTS.md` |
+| Project memory | `CLAUDE.md` (can also read `AGENTS.md`) | `GEMINI.md` (configurable, can read `AGENTS.md`) | `AGENTS.md` | `.cursor/rules/*.mdc`, `AGENTS.md` | `.github/copilot-instructions.md`, `AGENTS.md` |
 | Commands | `.claude/commands/*.md` | `.gemini/commands/*.toml` | `~/.codex/prompts/*.md` | `.cursor/commands/*.md` | `.github/prompts/*.prompt.md` |
 | Agents | `.claude/agents/*.md` | Extensions / experimental subagents — else inline roles | Inline roles via `AGENTS.md` | Custom modes / inline roles | `.github/agents/*.agent.md` |
 | Skills | `.claude/skills/<name>/SKILL.md` | Experimental skills support in recent versions — else `@file` references | Skills support in recent versions — else referenced files | Referenced files / rules | Skills support in recent versions — else referenced files |

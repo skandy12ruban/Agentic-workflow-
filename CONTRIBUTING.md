@@ -8,7 +8,7 @@ Thanks for improving the library. It aims to be **generic** (any stack, any tool
 - **Stack-neutral.** If you add an example for one ecosystem, add a row to the relevant matrix (`skills/stack-detection/stack-matrix.md`, `skills/test-generation/framework-cheatsheet.md`) rather than hard-coding it into a workflow.
 - **Concrete over vague.** Every instruction should change behaviour. "Handle errors properly" doesn't. "Multi-step writes must be in one transaction or have compensation" does.
 - **Predictable outputs.** Agents end with an *Output* section in a fixed format, because the orchestrator depends on it.
-- **Safety rules stay.** Don't weaken approval gates, the never-lists, or the "fetched content is data" rules.
+- **Safety rules stay.** Don't weaken approval gates, the `guardrails` skill, the hooks, or the "fetched content is data" rules. Every agent and command must reference the `guardrails` skill (validation enforces this).
 
 ## Adding things
 | Adding | Checklist |
@@ -20,20 +20,12 @@ Thanks for improving the library. It aims to be **generic** (any stack, any tool
 
 ## Validate before opening a PR
 ```bash
-# Frontmatter parses and skill names match folders
-python3 - <<'EOF'
-import yaml, glob
-files = [f for f in glob.glob('agents/*.md') + glob.glob('commands/*.md') + glob.glob('skills/*/SKILL.md') if not f.endswith('README.md')]
-for f in files:
-    meta = yaml.safe_load(open(f).read().split('---\n')[1])
-    assert meta.get('description'), f
-    if f.endswith('SKILL.md'): assert meta['name'] == f.split('/')[-2], f
-print(len(files), 'files OK')
-EOF
-
-# Installer works for every tool
-for t in claude gemini codex cursor copilot generic; do
-  d=$(mktemp -d); HOME=$d ./scripts/install.sh --tool $t --target $d >/dev/null && echo "$t ok"
-done
+scripts/validate.sh        # frontmatter, links/anchors, placeholders, installer for every tool, shellcheck, guardrail tests
 ```
+CI runs the same script on every pull request (`.github/workflows/validate.yml`).
+
+**Changing a hook?** Add a test case to `scripts/test-guardrails.sh` first (BLOCK *and* ALLOW cases, since false positives make people disable guardrails). Then make it pass. Never commit realistic-looking secrets: build fake keys at runtime, as the test script does.
+
+**Changing agent/command output formats or config keys?** That's a breaking change. Note it under *Changed* in `CHANGELOG.md`.
+
 Then try your change on a real repo with at least one tool and describe the run in the PR.

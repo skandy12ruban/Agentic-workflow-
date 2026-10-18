@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git show:*)",
+      "Bash(git branch:*)", "Bash(git switch:*)", "Bash(git fetch:*)", "Bash(git grep:*)",
+      "Bash(git add:*)", "Bash(git commit:*)", "Bash(git stash push:*)", "Bash(git rev-parse:*)",
+      "Bash(ls:*)", "Bash(pwd)", "Bash(which:*)",
+      "Bash(npm test:*)", "Bash(npm run lint:*)", "Bash(npm run test:*)", "Bash(npm run typecheck:*)", "Bash(npm run build:*)",
+      "Bash(pnpm test:*)", "Bash(pnpm lint:*)", "Bash(pnpm typecheck:*)", "Bash(pnpm build:*)",
+      "Bash(yarn test:*)", "Bash(yarn lint:*)",
+      "Bash(npx vitest:*)", "Bash(npx jest:*)", "Bash(npx tsc:*)", "Bash(npx eslint:*)", "Bash(npx prettier --check:*)", "Bash(npx playwright test:*)",
+      "Bash(pytest:*)", "Bash(ruff check:*)", "Bash(ruff format --check:*)", "Bash(mypy:*)",
+      "Bash(go test:*)", "Bash(go vet:*)", "Bash(go build:*)",
+      "Bash(cargo test:*)", "Bash(cargo clippy:*)", "Bash(cargo fmt --check:*)",
+      "Bash(./gradlew test:*)", "Bash(./mvnw test:*)", "Bash(dotnet test:*)", "Bash(bundle exec rspec:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)", "Bash(git merge:*)", "Bash(git rebase:*)", "Bash(git commit --amend:*)",
+      "Bash(npm install:*)", "Bash(npm i:*)", "Bash(pnpm add:*)", "Bash(yarn add:*)", "Bash(pip install:*)", "Bash(uv add:*)",
+      "Bash(poetry add:*)", "Bash(go get:*)", "Bash(cargo add:*)", "Bash(bundle add:*)", "Bash(composer require:*)", "Bash(dotnet add:*)",
+      "Bash(docker:*)", "Bash(curl:*)", "Bash(wget:*)",
+      "WebFetch",
+      "mcp__github__create_pull_request", "mcp__github__create_or_update_file", "mcp__github__push_files",
+      "mcp__github__add_issue_comment", "mcp__github__pull_request_review_write"
+    ],
+    "deny": [
+      "Bash(git push --force:*)", "Bash(git push -f:*)", "Bash(git reset --hard:*)", "Bash(git clean:*)",
+      "Bash(sudo:*)", "Bash(rm -rf /:*)", "Bash(rm -rf ~:*)",
+      "Bash(terraform apply:*)", "Bash(terraform destroy:*)", "Bash(kubectl delete:*)", "Bash(kubectl apply:*)",
+      "Bash(npm publish:*)", "Bash(gh pr merge:*)",
+      "mcp__github__merge_pull_request", "mcp__github__delete_file", "mcp__github__create_repository", "mcp__github__fork_repository",
+      "Read(./.env)", "Read(./**/.env)", "Read(./.env.local)", "Read(./.env.production)", "Read(./secrets/**)", "Read(./**/*.pem)", "Read(./**/*.key)",
+      "Read(~/.ssh/**)", "Read(~/.aws/**)", "Read(~/.kube/**)",
+      "Edit(./.claude/settings.json)", "Edit(./.claude/hooks/**)", "Write(./.claude/settings.json)", "Write(./.claude/hooks/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-bash.sh" }] },
+      { "matcher": "Read|Edit|Write|MultiEdit|NotebookEdit|Grep|Glob",
+        "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-files.sh" }] }
+    ]
+  }
+}

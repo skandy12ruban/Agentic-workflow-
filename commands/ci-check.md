@@ -7,6 +7,9 @@ argument-hint: '[RUN-ID] [--remote] [--stage format|lint|types|build|test|all]'
 
 **Input:** $ARGUMENTS
 
+> **Requires** — agents: ci-guardian · skills: guardrails, ci-verification, stack-detection · MCP: VCS (optional, for --remote).
+> Missing a file? Do that step yourself from the description here and say which file was missing. **Guardrails:** follow the `guardrails` skill throughout; stop if `.agentic/STOP` exists.
+
 1. Delegate to the `ci-guardian` agent (it applies the `ci-verification` skill):
    - Discover the gate from project memory → CI config → scripts → defaults.
    - Run stages cheapest-first (or only `--stage`), using CI's flags.

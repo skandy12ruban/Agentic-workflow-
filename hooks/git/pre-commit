@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Tool-agnostic git pre-commit guard (works for every AI agent and for humans).
+#   - Refuses commits directly on protected branches.
+#   - Refuses staged secret/credential files (.env, keys, tfstate, ...).
+#   - Scans added lines for credentials (built-in patterns + gitleaks if installed).
+#   - Refuses leftover agent debug markers: DEBUG(agent)
+#
+# Install:   cp hooks/git/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+#   (husky/lefthook/pre-commit users: call this script from your existing hook instead.)
+# Fake keys in test fixtures: add "guardrails:allow-secret" on the same line.
+# Humans can bypass in an emergency with: git commit --no-verify   (agents are blocked from doing this)
+set -uo pipefail
+
+PROTECTED="${AGENTIC_PROTECTED_BRANCHES:-main|master|develop|development|trunk|stable|prod|production|release/.*|releases/.*|hotfix/.*}"
+fail() { echo "✋ pre-commit guardrail: $1" >&2; exit 1; }
+
+branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)"
+if [[ "$branch" =~ ^($PROTECTED)$ && "${AGENTIC_ALLOW_PROTECTED_COMMIT:-0}" != "1" ]]; then
+  fail "committing directly to protected branch '$branch'. Create a feature branch: git switch -c feat/<ticket>-<slug>
+   (humans: AGENTIC_ALLOW_PROTECTED_COMMIT=1 git commit ... to override)"
+fi
+
+staged="$(git diff --cached --name-only --diff-filter=ACMR)"
+while IFS= read -r f; do
+  [[ -z "$f" ]] && continue
+  b="$(basename -- "$f")"
+  case "$b" in
+    .env.example|.env.sample|.env.template|.env.dist|.env.defaults) continue ;;
+    .env|.env.*|*.env|id_rsa*|id_ed25519*|id_ecdsa*|*.pem|*.key|*.p12|*.pfx|*.jks|*.keystore|*.tfstate|*.tfstate.backup|.netrc|.pypirc|credentials|*credentials*.json|service-account*.json)
+      fail "staged file '$f' looks like a secret. Unstage it (git restore --staged '$f') and add it to .gitignore." ;;
+  esac
+done <<<"$staged"
+
+secret_re='AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22,}|glpat-[A-Za-z0-9_-]{20,}|xox[abprs]-[A-Za-z0-9-]{10,}|sk-(ant-|proj-|live-)?[A-Za-z0-9_-]{32,}|sk_live_[0-9A-Za-z]{24,}|rk_live_[0-9A-Za-z]{24,}|AIza[0-9A-Za-z_-]{35}|SG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}|npm_[A-Za-z0-9]{36}|-----BEGIN ([A-Z]+ )?PRIVATE KEY-----'
+added="$(git diff --cached -U0 --no-color | grep -E '^\+[^+]' || true)"
+hits="$(printf '%s\n' "$added" | grep -E -- "$secret_re" | grep -v 'guardrails:allow-secret' || true)"
+if [[ -n "$hits" ]]; then
+  fail "staged changes contain what looks like a credential:
+$(printf '%s\n' "$hits" | cut -c1-12 | sed 's/$/…  (truncated)/')
+   Move it to environment/secret config. For fake test keys, add 'guardrails:allow-secret' on that line."
+fi
+
+if command -v gitleaks >/dev/null 2>&1; then
+  if gitleaks help git >/dev/null 2>&1; then
+    gitleaks git --staged --no-banner --redact >/dev/null 2>&1 || fail "gitleaks found secrets in staged changes (run: gitleaks git --staged -v)."
+  else
+    gitleaks protect --staged --no-banner --redact >/dev/null 2>&1 || fail "gitleaks found secrets in staged changes (run: gitleaks protect --staged -v)."
+  fi
+fi
+
+if printf '%s\n' "$added" | grep -q 'DEBUG(agent)'; then
+  fail "temporary agent diagnostics ('DEBUG(agent)') are staged. Remove them before committing."
+fi
+
+exit 0

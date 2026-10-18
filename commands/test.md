@@ -7,6 +7,9 @@ argument-hint: '[RUN-ID | path/or/glob | "describe what to test"] [--level unit|
 
 **Input:** $ARGUMENTS
 
+> **Requires** — agents: test-engineer (debugger optional) · skills: guardrails, stack-detection, test-generation · MCP: none.
+> Missing a file? Do that step yourself from the description here and say which file was missing. **Guardrails:** follow the `guardrails` skill throughout; stop if `.agentic/STOP` exists.
+
 1. **Determine the target:**
    - RUN-ID → the run's diff vs base + `plan.md` test strategy + `ticket.md` ACs.
    - A path/glob → that code (and its current behaviour as the spec — write characterization tests).

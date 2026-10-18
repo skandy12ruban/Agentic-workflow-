@@ -7,6 +7,9 @@ argument-hint: '<RUN-ID | path/to/plan.md>'
 
 **Input:** $ARGUMENTS
 
+> **Requires** — agents: implementer · skills: guardrails, workflow-state, approval-gate, git-workflow · MCP: none.
+> Missing a file? Do that step yourself from the description here and say which file was missing. **Guardrails:** follow the `guardrails` skill throughout; stop if `.agentic/STOP` exists.
+
 1. Locate the run: `.agentic/runs/<RUN-ID>/` or the given plan path. No plan → tell the user to run `/plan` first. Stop.
 2. Verify `state.md` has `plan_approved: yes` **and** `plan.md` hasn't changed since approval (compare `plan_version`). Otherwise → apply the `approval-gate` skill first.
 3. Apply the `git-workflow` skill: ensure a clean tree, fetch base, create/switch to the feature branch.

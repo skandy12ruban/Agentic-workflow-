@@ -4,7 +4,7 @@ Cursor has project rules (`.cursor/rules/*.mdc`), reads `AGENTS.md`, supports cu
 
 ## 1. Install the library
 ```bash
-git clone https://github.com/<you>/agentic-workflow.git ~/agentic-workflow
+git clone https://github.com/skandy12ruban/Agentic-workflow-.git ~/agentic-workflow
 ~/agentic-workflow/scripts/install.sh --tool cursor --target /path/to/your/repo
 ```
 Creates:

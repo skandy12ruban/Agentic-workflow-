@@ -7,6 +7,9 @@ argument-hint: '[RUN-ID | PR number/URL | branch | path] [--fix] [--post] [--sec
 
 **Input:** $ARGUMENTS
 
+> **Requires** — agents: code-reviewer, security-auditor · skills: guardrails, code-review, security-review · MCP: VCS (optional, for PR targets and --post).
+> Missing a file? Do that step yourself from the description here and say which file was missing. **Guardrails:** follow the `guardrails` skill throughout; stop if `.agentic/STOP` exists.
+
 1. **Resolve the diff:**
    - PR number/URL → fetch the PR diff + description + existing review comments via VCS MCP (or `gh pr diff`).
    - Branch → `git diff <base>...<branch>`. RUN-ID → that run's branch.

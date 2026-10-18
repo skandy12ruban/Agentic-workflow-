@@ -4,7 +4,7 @@ Codex reads `AGENTS.md` natively (global `~/.codex/AGENTS.md`, repo root, and ne
 
 ## 1. Install the library
 ```bash
-git clone https://github.com/<you>/agentic-workflow.git ~/agentic-workflow
+git clone https://github.com/skandy12ruban/Agentic-workflow-.git ~/agentic-workflow
 ~/agentic-workflow/scripts/install.sh --tool codex --target /path/to/your/repo
 ```
 This creates:

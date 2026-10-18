@@ -7,6 +7,9 @@ argument-hint: '[RUN-ID | "METHOD /path" | operation name | spec file] [--codify
 
 **Input:** $ARGUMENTS
 
+> **Requires** — agents: api-tester · skills: guardrails, api-testing, test-generation · MCP: none (DB MCP optional).
+> Missing a file? Do that step yourself from the description here and say which file was missing. **Guardrails:** follow the `guardrails` skill throughout; stop if `.agentic/STOP` exists.
+
 1. **Target:**
    - RUN-ID → ACs + new/changed endpoints from the diff.
    - `METHOD /path`, GraphQL operation, or gRPC method → that operation.

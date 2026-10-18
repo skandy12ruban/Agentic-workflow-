@@ -4,7 +4,7 @@ Gemini CLI has project memory (`GEMINI.md`), custom commands (TOML), MCP, and ex
 
 ## 1. Install the library
 ```bash
-git clone https://github.com/<you>/agentic-workflow.git ~/agentic-workflow
+git clone https://github.com/skandy12ruban/Agentic-workflow-.git ~/agentic-workflow
 ~/agentic-workflow/scripts/install.sh --tool gemini --target /path/to/your/repo
 ```
 This creates:

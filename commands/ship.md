@@ -7,6 +7,9 @@ argument-hint: '[RUN-ID] [--draft] [--reviewers a,b] [--no-watch]'
 
 **Input:** $ARGUMENTS
 
+> **Requires** — agents: ci-guardian, docs-writer (optional) · skills: guardrails, git-workflow, approval-gate, workflow-state · MCP: VCS (falls back to gh/glab/az CLI), tracker (optional).
+> Missing a file? Do that step yourself from the description here and say which file was missing. **Guardrails:** follow the `guardrails` skill throughout; stop if `.agentic/STOP` exists.
+
 Apply the `git-workflow` skill throughout. Hard rules: never push to base/protected branches, never force-push others' branches, never merge.
 
 1. **Pre-flight**

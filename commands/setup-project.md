@@ -7,6 +7,9 @@ argument-hint: '[--file CLAUDE.md|AGENTS.md|GEMINI.md] [--monorepo]'
 
 **Input:** $ARGUMENTS
 
+> **Requires** — agents: docs-writer (optional) · skills: guardrails, stack-detection, ci-verification · MCP: none.
+> Missing a file? Do that step yourself from the description here and say which file was missing. **Guardrails:** follow the `guardrails` skill throughout; stop if `.agentic/STOP` exists.
+
 Goal: produce (or update) the project memory file so every other command works with zero guessing. **Ask before overwriting** an existing memory file — prefer merging a new `## Workflow Configuration` section into it.
 
 1. **Pick the file:** `--file` if given; else the one that already exists; else ask which tool(s) the team uses:

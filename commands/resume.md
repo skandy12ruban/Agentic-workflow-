@@ -7,6 +7,9 @@ argument-hint: '[RUN-ID]  (omit to list resumable runs)'
 
 **Input:** $ARGUMENTS
 
+> **Requires** — agents: whichever the remaining phases need · skills: guardrails, workflow-state, approval-gate · MCP: as for /task.
+> Missing a file? Do that step yourself from the description here and say which file was missing. **Guardrails:** follow the `guardrails` skill throughout; stop if `.agentic/STOP` exists.
+
 1. **No RUN-ID:** list `.agentic/runs/*/state.md` whose `phase` isn't `done`/`stopped`, newest first, as a table (RUN-ID, title, phase, blockers, updated). Ask which to resume.
 2. **Load** `state.md` and apply the `workflow-state` skill's resume protocol:
    - Reconcile with reality: branch exists/checked out, commits present, working tree state, plan unchanged since approval.

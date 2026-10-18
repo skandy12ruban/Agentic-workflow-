@@ -13,6 +13,15 @@ An agent that can read your tracker, write code, run commands and open PRs is po
 
 Use **all** of them. Instructions alone are not a security boundary.
 
+| Layer | In this repo | Tested by |
+|---|---|---|
+| Instructions | [`skills/guardrails`](../skills/guardrails/SKILL.md) (risk classes R0–R4, injection protocol, honesty rule), Boundaries in [`templates/AGENTS.md`](../templates/AGENTS.md), a guardrail header in every agent and command | [behavioural red-team scenarios](guardrail-tests.md) |
+| Approval gates | [`skills/approval-gate`](../skills/approval-gate/SKILL.md); `autonomous` requires `sandboxed: true` | red-team scenarios 3, 4 |
+| Tool permissions | [`hooks/claude/settings.json`](../hooks/claude/settings.json) allow/ask/deny | – |
+| Hooks | [`guard-bash.sh`](../hooks/claude/guard-bash.sh), [`guard-files.sh`](../hooks/claude/guard-files.sh), [git `pre-commit`/`pre-push`](../hooks/git/), kill switch `.agentic/STOP` | `scripts/test-guardrails.sh` (150 cases, runs in CI) |
+| Sandbox & credentials | Your environment: see §5 | [mechanical checklist](guardrail-tests.md#mechanical-checks-one-time-per-environment) |
+| Repository protections | Your Git host: see §6 | same checklist |
+
 ## 1. Instructions
 - `AGENTS.md` → **Boundaries** section: Always / Ask first / Never. Short and concrete.
 - Every agent in this library has explicit "never" rules (no force push, no skipping tests, no prod access).
@@ -31,12 +40,11 @@ Configure your tool to:
 See per-tool examples in [`setup/`](setup/).
 
 ## 4. Hooks
-Deterministic checks the model can't skip (Claude Code, and other tools with hook support):
-- Block pushes to base/protected branches and `--no-verify`.
-- Auto-format after edits.
-- Run a secret scanner on staged files before commit.
-- Block edits to protected paths (`infra/`, `migrations/` already applied, generated code).
-- Notify you when an approval gate is waiting.
+Deterministic checks the model can't skip. Ready-made, tested, fail-closed implementations are in [`hooks/`](../hooks/):
+- **Claude Code `PreToolUse`**: blocks protected-branch pushes, force-push, `--no-verify`, destructive git, PR merges, dangerous `rm`, `sudo`, `curl | sh`, cloud/k8s/infra changes, deploys, DB drops, publishing, reading secrets, env dumps, and edits to the guardrails themselves. Asks before CI config changes. Blocks credentials in written content.
+- **Git `pre-commit` / `pre-push`** (every tool, humans too): no commits or pushes to protected branches, no force-push, no branch/tag deletion, no tag pushes, secret scan, no `DEBUG(agent)` leftovers.
+- **Kill switch**: `touch .agentic/STOP` halts every agent action until a human removes it.
+- **Protected paths**: one glob per line in `.agentic/protected-paths`.
 
 ## 5. Sandbox & credentials
 - Run autonomous/background agents in containers, devcontainers, or cloud sandboxes — not on a laptop with production credentials.
@@ -62,6 +70,12 @@ Mitigations you add:
 - Don't paste production PII into tickets the agent reads, or into tests it writes. The `systematic-debugging` skill synthesizes equivalent data instead.
 - Redact tokens in saved transcripts (the `api-testing` skill does this by default).
 - Check your organization's policy on which repos and data may be sent to which AI providers.
+
+## Incident response (when an agent did something it shouldn't)
+1. `touch .agentic/STOP` to halt it. Revoke or rotate any token it held if a secret may have leaked.
+2. Preserve evidence: `.agentic/runs/<RUN-ID>/state.md` log, the tool transcript, `git reflog`.
+3. Undo: revert commits (don't rewrite shared history), close PRs, restore from the remote.
+4. Fix the layer that failed (instruction, permission, hook, credential scope). Add a case to `scripts/test-guardrails.sh` or [the red-team scenarios](guardrail-tests.md) so it can't recur.
 
 ## Reviewing agent-authored PRs (for humans)
 Look hardest at: authorization checks, migrations, error handling paths, deleted or modified tests, new dependencies, and anything in the PR that the plan didn't mention. The `review.md`, `test-report.md`, and `e2e-report.md` in the run directory tell you what the agent checked — and, by omission, what it didn't.

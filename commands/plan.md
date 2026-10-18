@@ -7,6 +7,9 @@ argument-hint: '<TICKET-KEY | issue URL | "free-text task">'
 
 **Input:** $ARGUMENTS
 
+> **Requires** — agents: codebase-explorer, planner · skills: guardrails, workflow-state, task-intake, stack-detection, planning, approval-gate · MCP: tracker (optional).
+> Missing a file? Do that step yourself from the description here and say which file was missing. **Guardrails:** follow the `guardrails` skill throughout; stop if `.agentic/STOP` exists.
+
 Run Phases 0–4 of the `/task` workflow and stop at the approval gate. **Do not modify any source files.** Only write under `.agentic/runs/<RUN-ID>/`.
 
 1. **Bootstrap:** read project memory; determine RUN-ID; create `state.md` (`workflow-state` skill).

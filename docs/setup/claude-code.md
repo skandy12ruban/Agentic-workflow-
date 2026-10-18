@@ -6,7 +6,7 @@ Claude Code supports every building block natively — agents, commands, skills,
 
 **A. Install script (project-level, recommended for teams)**
 ```bash
-git clone https://github.com/<you>/agentic-workflow.git ~/agentic-workflow
+git clone https://github.com/skandy12ruban/Agentic-workflow-.git ~/agentic-workflow
 ~/agentic-workflow/scripts/install.sh --tool claude --target /path/to/your/repo
 ```
 
@@ -42,62 +42,23 @@ claude mcp add --scope project --transport http github https://api.githubcopilot
 Run `/mcp` in a session to authenticate OAuth servers and check status.
 
 ## 4. Permissions & hooks — `.claude/settings.json`
-Pre-approve safe, frequent commands to reduce prompts; hard-deny dangerous ones; add deterministic hooks. Adjust commands to your stack:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git switch:*)",
-      "Bash(git add:*)", "Bash(git commit:*)",
-      "Bash(pnpm test:*)", "Bash(pnpm lint:*)", "Bash(pnpm typecheck:*)", "Bash(pnpm build:*)",
-      "Bash(npx vitest:*)", "Bash(npx playwright test:*)",
-      "mcp__playwright"
-    ],
-    "ask": [
-      "Bash(git push:*)", "Bash(pnpm add:*)", "Bash(npm install:*)",
-      "mcp__github__create_pull_request"
-    ],
-    "deny": [
-      "Bash(git push --force:*)", "Bash(git push -f:*)", "Bash(git reset --hard:*)",
-      "Bash(rm -rf:*)", "Bash(terraform apply:*)", "Bash(kubectl delete:*)",
-      "mcp__github__merge_pull_request",
-      "Read(./.env)", "Read(./.env.*)", "Read(./secrets/**)"
-    ]
-  },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [{ "type": "command", "command": "npx prettier --write \"$(jq -r '.tool_input.file_path')\" >/dev/null 2>&1 || true" }]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [{ "type": "command", "command": ".claude/hooks/guard-bash.sh" }]
-      }
-    ]
-  }
-}
-```
-MCP permission names: `mcp__<server>` (all tools of a server) or `mcp__<server>__<tool>`.
-
-Example guard hook — `.claude/hooks/guard-bash.sh` (make it executable). Exit code 2 blocks the call and shows stderr to the model:
+The installer sets this up by default. To do it by hand:
 ```bash
-#!/usr/bin/env bash
-cmd=$(jq -r '.tool_input.command // ""')
-base=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#origin/##'); base=${base:-main}
-if echo "$cmd" | grep -Eq "git push .*(origin )?($base|master|main)(\s|$)"; then
-  echo "Blocked: pushing to the base branch is not allowed. Push a feature branch instead." >&2; exit 2
-fi
-if echo "$cmd" | grep -Eq -- "--no-verify"; then
-  echo "Blocked: do not bypass git hooks; fix the hook failure." >&2; exit 2
-fi
-exit 0
+mkdir -p .claude/hooks
+cp ~/agentic-workflow/hooks/claude/guard-*.sh .claude/hooks/ && chmod +x .claude/hooks/*.sh
+[ -f .claude/settings.json ] || cp ~/agentic-workflow/hooks/claude/settings.json .claude/settings.json
+cp ~/agentic-workflow/hooks/git/pre-commit ~/agentic-workflow/hooks/git/pre-push .git/hooks/
 ```
+What you get (details and configuration in [`hooks/README.md`](../../hooks/README.md)):
+- **[`settings.json`](../../hooks/claude/settings.json)**: *allow* read-only git plus common test/lint/build commands; *ask* for push, installs, network, and PR creation; *deny* force-push, `reset --hard`, `sudo`, infra applies, publishing, PR merges, secret files, and edits to the guardrails themselves.
+- **[`guard-bash.sh`](../../hooks/claude/guard-bash.sh)**: a `PreToolUse` hook that blocks dozens of destructive, external, and bypass command families (protected-branch pushes, `--no-verify`, `curl | sh`, cloud and k8s mutations, DB drops, env dumps, …).
+- **[`guard-files.sh`](../../hooks/claude/guard-files.sh)**: blocks secret files, guardrail edits, lockfile hand-edits, and protected paths. Asks before CI config changes. Blocks writing credentials into files.
+- Both honour the **kill switch**: `touch .agentic/STOP` halts the agent instantly.
+- Both are covered by `scripts/test-guardrails.sh`, and both **fail closed**.
 
-Other useful hooks: `Stop` → run a quick typecheck and block finishing if it fails; `SessionStart` → print `git status` and the active run's `state.md` summary; `Notification` → desktop/phone notification when an approval gate is waiting.
+Adjust the `allow` list to your stack's commands (e.g. add `Bash(make test:*)`). MCP permission names look like `mcp__<server>` (all tools of a server) or `mcp__<server>__<tool>`.
+
+Optional extra hooks: `PostToolUse` on `Edit|Write` to auto-format the edited file (`"command": "npx prettier --write \"$(jq -r '.tool_input.file_path')\""`, needs jq and prettier). `Notification` to ping you when an approval gate is waiting. `SessionStart` to print the active run's `state.md` summary.
 
 ## 5. Use it
 ```text

@@ -1,0 +1,29 @@
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install tools
+        run: |
+          python -m pip install --quiet pyyaml
+          sudo apt-get install -y --no-install-recommends shellcheck jq >/dev/null
+      - name: Validate library (frontmatter, links, installer, guardrail tests, shellcheck)
+        run: |
+          git config --global user.email ci@example.com
+          git config --global user.name ci
+          git config --global init.defaultBranch main
+          scripts/validate.sh

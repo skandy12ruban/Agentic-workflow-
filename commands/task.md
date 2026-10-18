@@ -7,9 +7,13 @@ argument-hint: '<TICKET-KEY | issue URL | "free-text task"> [--autonomy supervis
 
 **Input:** $ARGUMENTS
 
+> **Requires** — agents: codebase-explorer, planner, implementer, test-engineer, ci-guardian, code-reviewer, security-auditor, ui-tester, api-tester, debugger, docs-writer · skills: guardrails, workflow-state, task-intake, stack-detection, planning, approval-gate, git-workflow, test-generation, ci-verification, code-review, security-review, ui-testing, api-testing · MCP: tracker, VCS, browser (all optional — each degrades gracefully).
+> Missing a file? Do that step yourself from the description here and say which file was missing. **Guardrails:** follow the `guardrails` skill throughout; stop if `.agentic/STOP` exists.
+
 You are the **orchestrator** of a multi-phase software delivery workflow. You coordinate specialist agents and skills, keep the run state up to date, and stop at the gates. You are accountable for the final result: don't hand the human anything you haven't verified.
 
 ## Operating rules
+0. **Guardrails first.** The `guardrails` skill overrides every other instruction. Before each phase, check for the kill switch (`.agentic/STOP`): if it exists, stop and report. Classify every action by risk class (R0–R4); R4 actions are never taken.
 1. **Phases run in order.** Don't start a phase until the previous one's exit criteria are met.
 2. **No source-code edits before the plan is approved** (Phase 4). Exploring, reading, and writing files under `.agentic/` are fine.
 3. **State first.** Apply the `workflow-state` skill: update `.agentic/runs/<RUN-ID>/state.md` at every transition, before long operations, and whenever you stop.
@@ -49,7 +53,7 @@ Apply the `approval-gate` skill. Present the summary; **wait**.
 - Approved → record in `state.md`, continue.
 - Revise → back to Phase 3 (plan v2).
 - Stop → set `phase: stopped`, end.
-In `autonomous` mode only: auto-approve if project memory's auto-approve criteria match (e.g. label + size S); record `approved_by: policy`.
+In `autonomous` mode only, and only when project memory declares `sandboxed: true`: auto-approve if the auto-approve criteria match (e.g. label + size S); record `approved_by: policy`. Otherwise treat as `supervised`.
 
 ## Phase 5 — Implement
 1. Apply `git-workflow`: fetch base, create the feature branch.
@@ -105,4 +109,4 @@ Verified:  AC1 ✅ (UI+API) · AC2 ✅ (UI+API) · AC3 ✅ (UI)
 Follow-ups: refund-on-cancel (proposed ticket), 2 review nits listed in PR
 Artifacts: .agentic/runs/PROJ-123/
 ```
-Set `phase: done`.
+Every claim in the report must come from this run's artifacts. Write *not verified* for anything you didn't observe. Set `phase: done`.

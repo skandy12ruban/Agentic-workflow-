@@ -11,7 +11,7 @@ The single most important safety mechanism in the workflow. The agent **stops**,
 
 | Gate | Default | Configurable via `autonomy` |
 |---|---|---|
-| Plan approval before any source edit | Always | `autonomous` may auto-approve labelled small tickets |
+| Plan approval before any source edit | Always | `autonomous` may auto-approve labelled small tickets **only if** project memory sets `sandboxed: true` |
 | Push branch + open PR | `supervised` | skipped in `standard`/`autonomous` |
 | Material deviation from approved plan | Always | No |
 | New dependency, schema migration, public API change not in plan | Always | No |

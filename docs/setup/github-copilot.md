@@ -4,7 +4,7 @@ Copilot supports repository instructions, `AGENTS.md`, prompt files (slash comma
 
 ## 1. Install the library
 ```bash
-git clone https://github.com/<you>/agentic-workflow.git ~/agentic-workflow
+git clone https://github.com/skandy12ruban/Agentic-workflow-.git ~/agentic-workflow
 ~/agentic-workflow/scripts/install.sh --tool copilot --target /path/to/your/repo
 ```
 Creates:
@@ -36,6 +36,8 @@ tools: ['codebase', 'search', 'usages', 'problems', 'changes']
 ---
 <agent body from agents/code-reviewer.md>
 ```
+> ⚠️ The installer **drops** the Claude-style `tools:` line (tool names differ in Copilot), so converted agents get Copilot's default tools. For the read-only roles (`codebase-explorer`, `code-reviewer`, `security-auditor`), add an explicit read-only `tools:` list for your Copilot version (search/read tools only, no edit or terminal tools).
+
 Older versions called these *chat modes* (`.github/chatmodes/*.chatmode.md`). Copilot custom agents run in the main conversation rather than as isolated subagents unless your version supports subagent delegation — the workflow still works because each role is fully specified.
 
 ## 2. Project memory

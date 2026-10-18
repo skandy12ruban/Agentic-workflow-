@@ -96,6 +96,6 @@ Set `autonomy` in your project memory's Workflow Configuration:
 |---|---|
 | `supervised` (default) | Approval required for the plan **and** before pushing/opening the PR. |
 | `standard` | Approval required for the plan only. Push + PR are automatic. |
-| `autonomous` | Plan auto-approved for tickets labelled e.g. `agent-ok` and below a size threshold. Use only in sandboxes / CI-runner agents. |
+| `autonomous` | Plan auto-approved for tickets labelled e.g. `agent-ok` and below a size threshold. **Only takes effect when project memory declares `sandboxed: true`** (container/VM with scoped credentials); otherwise it falls back to `supervised`. |
 
-No level ever allows: merging, deploying, force-pushing, deleting branches you didn't create, rotating secrets, or running destructive DB commands against non-local databases.
+No level ever allows R4 actions (see the [`guardrails` skill](../skills/guardrails/SKILL.md)): merging, deploying, force-pushing, pushing to protected branches, deleting branches or tags, publishing, changing infrastructure or secrets, or destructive DB commands. The [hooks](../hooks/) enforce the most dangerous of these mechanically.
