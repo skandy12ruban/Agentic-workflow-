@@ -1,0 +1,9 @@
+# Agentic workflow — per-run scratch (plans, state, reports, screenshots)
+.agentic/runs/
+.agentic/adhoc/
+# Uncomment to also keep the installed library out of git (otherwise commit it so your team shares it):
+# .agentic/agents/
+# .agentic/skills/
+# .agentic/templates/
+# Personal agent memory files
+CLAUDE.local.md
